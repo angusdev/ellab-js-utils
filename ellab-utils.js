@@ -160,7 +160,7 @@ org.ellab.utils.arr_first = function(arr) {
   else {
     return null;
   }
-}
+};
 
 org.ellab.utils.arr_last = function(arr) {
   if (Object.prototype.toString.call(arr) === '[object Array]' && arr.length > 0) {
@@ -169,7 +169,18 @@ org.ellab.utils.arr_last = function(arr) {
   else {
     return null;
   }
+};
+
+org.ellab.utils.createDOM = function(obj) {
+  if (typeof obj === 'string') {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(obj, "text/html");
+    return doc;
 }
+  else {
+    return obj;
+  }
+};
 
 // return the first element instead of an array if the selector is simply an id
 org.ellab.utils.sizzleSmart = function(selector, context, results, seed) {
@@ -406,7 +417,7 @@ org.ellab.utils.parent = function(node, tagOrCallback, immediateParentOnly) {
   }
 };
 
-// iterate the parent nodes until match the tag name
+// iterate the prevSibling nodes until match the tag name
 org.ellab.utils.prevSibling = function(node, tagOrCallback, immediateSiblingOnly) {
   if (!node) return node;
 
@@ -426,6 +437,26 @@ org.ellab.utils.prevSibling = function(node, tagOrCallback, immediateSiblingOnly
   }
 };
 
+// iterate the nextSibling nodes until match the tag name
+org.ellab.utils.nextSibling = function(node, tagOrCallback, immediateSiblingOnly) {
+  if (!node) return node;
+
+  var nextSibling = node.nextSibling;
+
+  if (!nextSibling || !tagOrCallback) return nextSibling;
+
+  if (typeof tagOrCallback === 'string' && nextSibling.nodeType !== 3 && nextSibling.tagName && nextSibling.tagName.toUpperCase() == tagOrCallback.toUpperCase()) return nextSibling;
+
+  if (typeof tagOrCallback === 'function' && tagOrCallback.apply(nextSibling)) return nextSibling;
+
+  if (immediateSiblingOnly) {
+    return null;
+  }
+  else {
+    return this.nextSibling(nextSibling, tagOrCallback, immediateSiblingOnly);
+  }
+};
+
 org.ellab.utils.removeChild = function(node) {
   if (!node) return node;
 
@@ -435,7 +466,6 @@ org.ellab.utils.removeChild = function(node) {
 
   return node;
 };
-
 
 // inject an javascript to the main window, useful for call the function in window
 org.ellab.utils.inject = function(fn) {
